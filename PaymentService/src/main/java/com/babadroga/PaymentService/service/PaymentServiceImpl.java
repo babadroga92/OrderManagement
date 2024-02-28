@@ -2,7 +2,9 @@ package com.babadroga.PaymentService.service;
 
 import com.babadroga.PaymentService.dao.TransactionalDetailsDao;
 import com.babadroga.PaymentService.entity.TransactionDetails;
+import com.babadroga.PaymentService.model.PaymentMode;
 import com.babadroga.PaymentService.model.PaymentRequest;
+import com.babadroga.PaymentService.model.PaymentResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,5 +34,22 @@ public class PaymentServiceImpl implements PaymentService{
 
         log.info("Transaction Completed with Id: {}", transactionDetails.getId());
         return transactionDetails.getId();
+    }
+
+    @Override
+    public PaymentResponse getPaymentDetailsByOrderId(long orderId) {
+        log.info("Getting payment details for the Order Id: {}", orderId);
+        TransactionDetails transactionDetails = transactionalDetailsDao.findByOrderId(orderId);
+
+        PaymentResponse paymentResponse =
+                PaymentResponse.builder()
+                        .paymentId(transactionDetails.getId())
+                        .paymentMode(PaymentMode.valueOf(transactionDetails.getPaymentMode()))
+                        .paymentDate(transactionDetails.getPaymentDate())
+                        .orderId(transactionDetails.getOrderId())
+                        .status(transactionDetails.getPaymentStatus())
+                        .amount(transactionDetails.getAmount())
+                        .build();
+        return paymentResponse;
     }
 }
