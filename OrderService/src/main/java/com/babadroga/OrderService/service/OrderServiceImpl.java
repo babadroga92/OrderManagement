@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 @Log4j2
@@ -85,8 +86,16 @@ public class OrderServiceImpl implements OrderService{
         log.info("Getting payment information from the payment Service");
         ResponseEntity<PaymentResponse> paymentResponse = paymentService.getPaymentDetailsByOrderId(orderId);
 
+        if(paymentResponse.getBody() == null){
+            throw new OrderServiceCustomException("Payment Details not found", "NOT_FOUND", 404);
+        }
+
         ResponseEntity<ProductDetails> productDetails = productService.getProductById(order.getProductId());
-        OrderResponse orderResponse = OrderResponse.builder()
+        if(productDetails.getBody() == null){
+            throw new OrderServiceCustomException("Product details not found", "NOT_FOUND", 404);
+        }
+
+        return OrderResponse.builder()
                 .orderId(order.getId())
                 .orderStatus(order.getOrderStatus())
                 .amount(order.getAmount())
@@ -94,6 +103,11 @@ public class OrderServiceImpl implements OrderService{
                 .productDetails(productDetails.getBody())
                 .paymentResponse(paymentResponse.getBody())
                 .build();
-        return orderResponse;
+    }
+
+    @Override
+    public List<Order> listOfAllOrders() {
+        log.info("Fetching all orders");
+        return orderDao.findAll();
     }
 }
