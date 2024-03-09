@@ -85,15 +85,7 @@ public class OrderServiceImpl implements OrderService{
 
         log.info("Getting payment information from the payment Service");
         ResponseEntity<PaymentResponse> paymentResponse = paymentService.getPaymentDetailsByOrderId(orderId);
-
-        if(paymentResponse.getBody() == null){
-            throw new OrderServiceCustomException("Payment Details not found", "NOT_FOUND", 404);
-        }
-
         ResponseEntity<ProductDetails> productDetails = productService.getProductById(order.getProductId());
-        if(productDetails.getBody() == null){
-            throw new OrderServiceCustomException("Product details not found", "NOT_FOUND", 404);
-        }
 
         return OrderResponse.builder()
                 .orderId(order.getId())
