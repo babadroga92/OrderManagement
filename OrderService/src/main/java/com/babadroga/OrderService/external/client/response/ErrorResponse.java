@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ErrorResponse {
 
+    //This is a copy of ErrorResponse class from payment.model and product.model. It is used in CustomErrorDecoder to convert error response from the server into a Java object
+
     private String errorMessage;
     private String errorCode;
 

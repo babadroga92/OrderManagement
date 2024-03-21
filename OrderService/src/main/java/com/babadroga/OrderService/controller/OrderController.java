@@ -10,6 +10,7 @@ import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,19 +21,20 @@ import java.util.List;
 public class OrderController {
     @Autowired
     private OrderService orderService;
+
+    @PreAuthorize("hasAuthority('Customer')")
     @PostMapping("/placeOrder")
     public ResponseEntity<Long> placeOrder(@RequestBody OrderRequest orderRequest){
         long orderId = orderService.placeOrder(orderRequest);
         log.info("Order Id: {}", orderId);
         return new ResponseEntity<>(orderId, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAuthority('Admin') || hasAuthority('Customer')")
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getOrderDetails(@PathVariable long orderId){
         OrderResponse orderResponse = orderService.getOrderDetails(orderId);
         return new ResponseEntity<>(orderResponse, HttpStatus.OK);
-
-        //TODO: Orders created before adding Payment and Product Details into an order do not get returned. Instead, the error is thrown
-        //TODO: This needs fixing.
     }
 
     @GetMapping("/list")

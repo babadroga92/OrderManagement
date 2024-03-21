@@ -12,11 +12,12 @@ import java.io.IOException;
 @Log4j2
 public class CustomErrorDecoder implements ErrorDecoder {
     @Override
-    public Exception decode(String s, Response response) {
+    public Exception decode(String s, Response response) { //this method is called by Feign when it encounters an error response from the server
         ObjectMapper objectMapper = new ObjectMapper();
         log.info("::{}", response.request().url());
         log.info("::{}", response.request().headers());
         try {
+            //converting the error response from the server into a Java object
             ErrorResponse errorResponse =
                     objectMapper.readValue(response.body().asInputStream(), ErrorResponse.class);
             return new OrderServiceCustomException(errorResponse.getErrorMessage(), errorResponse.getErrorCode(), response.status());

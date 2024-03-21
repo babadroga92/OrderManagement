@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FeignConfig {
+
+    //This class is a Feign configuration to use CustomErrorDecoder to handle error responses from the server
     @Bean
     ErrorDecoder errorDecoder(){
         return new CustomErrorDecoder();
